@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        div {
+
+            width: 200px;
+            height: 100px;
+            background-color: green;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        input {
+            z-index: 10000;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+    </style>
+</head>
+<body>
+<input type="button" id="btn" value="显示效果吧"/>
+<div id="dv">
+</div>
+<script>
+    function getStyle(element,attribute){
+        return window.getComputedStyle?window.getComputedStyle(element,null)[attribute]:element.currentStyle[attribute]||0;
+
+    }
+    function animate(element,json,fn) {
+        clearInterval(element.timeId);
+        element.timeId=setInterval(function () {
+            var flag=true;
+            for (var attribute in json) {
+                if (attribute == "opacity") {
+                    var current = getStyle(element, attribute) * 100;
+                    var target = json[attribute] * 100;
+                    var step = (target - current) / 10;
+                    step = step > 0 ? Math.ceil(step) : Math.floor(step);
+                    current += step;
+                    element.style[attribute] = current / 100;
+                } else if (attribute == "zIndex") {
+                    element.style[attribute] = json[attribute];
+                } else {
+                    var current = parseInt(getStyle(element, attribute));
+                    var target = json[attribute];
+                    var step = (target - current) / 10;
+                    step = step > 0 ? Math.ceil(step) : Math.floor(step);
+                    current += step;
+                    element.style[attribute] = current + "px";
+                    if (current != target) {
+                        flag = false;
+                    }
+                }
+            }
+                if (flag) {
+                    clearInterval(element.timeId);
+                    if (fn) {
+                        fn();
+                    }
+                }
+                console.log("目标："+target+"，当前："+current+"每次移动的步数："+step);
+            },10)
+    }
+
+
+    document.getElementById("btn").onclick=function () {
+      var json1={
+          "width":500,"height":300,"left":300,"top":400,"opacity": .3,"zIndex":1000
+      };
+      animate(document.getElementById("dv"),json1,function () {
+          var json2={
+              "width":100,"height":50,"left":30,"top":40,"opacity": .9,"zIndex":999
+          };
+          animate(document.getElementById("dv"),json2,function () {
+              var json3={
+                  "width":700,"height":400,"left":400,"top":200,"opacity": .5
+              };
+              animate(document.getElementById("dv"),json3,function () {
+                  var json4={
+                    "width":300,"height":1000,"right":0,"top":50,"opacity": .8
+                  };
+                  animate(document.getElementById("dv"),json4,function () {
+                      var json5={
+                          "width":100,"height":100,"right":300,"bottom":50,"opacity": .6
+                      };
+                      animate(document.getElementById("dv"),{
+                          "width":100,"height":70,"left":0,"top":0,"opacity":1
+                      })
+                  })
+              });
+          });
+      });
+    };
+</script>
+</body>
+</html>
